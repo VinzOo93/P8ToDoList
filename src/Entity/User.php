@@ -13,7 +13,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @UniqueEntity("email")
  * @ORM\Entity(repositoryClass=UserRepository::class)
  */
-class User implements UserInterface
+class User implements UserInterface, \Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Column(type="integer")
@@ -29,6 +29,7 @@ class User implements UserInterface
     private $username;
 
     /**
+     * @var string
      * @ORM\Column(type="string", length=64)
      */
     private $password;
@@ -60,14 +61,16 @@ class User implements UserInterface
         return null;
     }
 
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
 
-    public function setPassword($password)
+    public function setPassword($password): self
     {
         $this->password = $password;
+
+        return $this;
     }
 
     public function getEmail()
