@@ -33,6 +33,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $username;
 
     /**
+     * @var array
      * @ORM\Column(type="json", nullable=true)
      */
     private $roles = [];
@@ -114,4 +115,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials()
     {
     }
+
+    public function __toString()
+    {
+        return $this->roles[0];
+    }
+
+
 }
