@@ -7,13 +7,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use \Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * @ORM\Table("user")
  * @UniqueEntity("email")
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @UniqueEntity(fields={"email","username"},
+ *     errorPath="name",
+ *     message="This value is already used.")
  */
-class User implements UserInterface, \Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Column(type="integer")
@@ -29,7 +33,12 @@ class User implements UserInterface, \Symfony\Component\Security\Core\User\Passw
     private $username;
 
     /**
-     * @var string
+     * @ORM\Column(type="json", nullable=true)
+     */
+    private $roles = [];
+
+    /**
+     * @var string The hashed password
      * @ORM\Column(type="string", length=64)
      */
     private $password;
@@ -54,6 +63,25 @@ class User implements UserInterface, \Symfony\Component\Security\Core\User\Passw
     public function setUsername($username)
     {
         $this->username = $username;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): ?array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(?array $roles): ?self
+    {
+        $this->roles = $roles;
+
+        return $this;
     }
 
     public function getSalt()
@@ -81,11 +109,6 @@ class User implements UserInterface, \Symfony\Component\Security\Core\User\Passw
     public function setEmail($email)
     {
         $this->email = $email;
-    }
-
-    public function getRoles()
-    {
-        return array('ROLE_USER');
     }
 
     public function eraseCredentials()
