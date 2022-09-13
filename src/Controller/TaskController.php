@@ -4,9 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Task;
 use App\Form\TaskType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use function Composer\Autoload\includeFile;
 
 class TaskController extends AbstractController
 {
@@ -21,7 +23,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks/create", name="task_create")
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request, EntityManagerInterface $entityManager)
     {
         $task = new Task();
         $form = $this->createForm(TaskType::class, $task);
@@ -29,10 +31,10 @@ class TaskController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-
-            $em->persist($task);
-            $em->flush();
+            $user = $this->getUser();
+            $task->setAuthor($user);
+            $entityManager->persist($task);
+            $entityManager->flush();
 
             $this->addFlash('success', 'La tâche a été bien été ajoutée.');
 
@@ -45,14 +47,15 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks/{id}/edit", name="task_edit")
      */
-    public function editAction(Task $task, Request $request)
+    public function editAction(Task $task, EntityManagerInterface $entityManager, Request $request)
     {
+
         $form = $this->createForm(TaskType::class, $task);
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
 
             $this->addFlash('success', 'La tâche a bien été modifiée.');
 
@@ -81,14 +84,23 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks/{id}/delete", name="task_delete")
      */
-    public function deleteTaskAction(Task $task)
+    public function deleteTaskAction(Task $task, EntityManagerInterface $entityManager )
     {
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($task);
-        $em->flush();
+        if ($this->getUser() === $task->getAuthor()){
+        $this->deleteTask($task, $entityManager);
+        }
+        if ($this->getUser()->getRoles() == 'ROLES_ADMIN' && $task->getId() == null){
+            $this->deleteTask($task, $entityManager);
+        }
 
         $this->addFlash('success', 'La tâche a bien été supprimée.');
 
         return $this->redirectToRoute('task_list');
+    }
+
+    private function deleteTask(Task $task,  EntityManagerInterface $entityManager)
+    {
+        $entityManager->remove($task);
+        $entityManager->flush();
     }
 }
