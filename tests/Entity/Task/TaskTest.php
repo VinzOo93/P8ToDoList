@@ -7,11 +7,11 @@ use App\Entity\User;
 use DateTime;
 use PHPUnit\Framework\TestCase;
 
-class TackTest extends TestCase
+class TaskTest extends TestCase
 {
 
 
-    public function testcratedAt()
+    public function testcreatedAt()
     {
         $date = new DateTime();
         $task = $this->getEntityTask();

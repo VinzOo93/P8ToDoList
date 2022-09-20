@@ -2,7 +2,6 @@
 
 namespace App\Tests\Entity\User;
 
-use App\Entity\Task;
 use App\Entity\User;
 use PHPUnit\Framework\TestCase;
 
