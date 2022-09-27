@@ -16,11 +16,11 @@ class UserController extends AbstractController
     /**
      * @Route("/users", name="user_list")
      */
-    public function listAction(): Response
+    public function listAction(EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        return $this->render('user/list.html.twig', ['users' => $this->getDoctrine()->getRepository(User::class)->findAll()]);
+        return $this->render('user/list.html.twig', ['users' => $entityManager->getRepository(User::class)->findAll()]);
     }
 
     /**
@@ -31,11 +31,15 @@ class UserController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         $user = new User();
+        $userRepo = $entityManager->getRepository(User::class);
         $form = $this->createForm(UserType::class, $user);
 
         $form->handleRequest($request);
-
         if ($form->isSubmitted() &&$form->isValid()) {
+            if ($userRepo->findOneBy(['username' => $form->get('username')->getData()])) {
+                $this->addFlash('error', "l'utilisateur éxiste déjà");
+                return  $this->redirectToRoute('user_create');
+            }
             $role = $form->get('roles');
             $user->setRoles($role->getData());
             $password = $userPasswordHasher->hashPassword($user, $user->getPassword());
@@ -46,6 +50,7 @@ class UserController extends AbstractController
             $this->addFlash('success', "L'utilisateur a bien été ajouté.");
 
             return $this->redirectToRoute('user_list');
+
         }
 
         return $this->render('user/create.html.twig', ['form' => $form->createView()]);
@@ -67,11 +72,8 @@ class UserController extends AbstractController
             $user->setRoles($role->getData());
             $password = $userPasswordHasher->hashPassword($user, $user->getPassword());
             $user->setPassword($password);
-
             $entityManager->flush();
-
             $this->addFlash('success', "L'utilisateur a bien été modifié");
-
             return $this->redirectToRoute('user_list');
         }
 
