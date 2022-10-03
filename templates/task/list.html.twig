@@ -14,7 +14,10 @@
                             {% if task.isDone %}<span class="glyphicon glyphicon-ok"></span>{% else %}<span
                                     class="glyphicon glyphicon-remove"></span>{% endif %}
                         </h4>
-                        <h4><a href="{{ path('task_edit', {'id' : task.id }) }}">{{ task.title }}</a></h4>
+                        <h4>{{ task.title }}</h4>
+                        {% if is_granted('ROLE_USER') or is_granted('ROLE_USER') %}
+                        <a href="{{ path('task_edit', {'id' : task.id }) }}">modifier</a>
+                        {% endif %}
                         {% if task.author is not null %}
                             <h5>Auteur : {{ task.author.username }}</h5>
                         {% else %}

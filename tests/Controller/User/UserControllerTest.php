@@ -52,9 +52,22 @@ class UserControllerTest extends WebTestCase
         $form['user[password][second]'] = '123456';
         $form['user[email]'] = 'pedro@gmail.com';
         $this->client->submit($form);
-        $this->assertSelectorTextNotContains(
+        $this->assertSelectorTextContains(
             'div.alert.alert-success',
-            "<strong>Superbe !</strong>  L'utilisateur a bien été ajouté."
+            "L'utilisateur a bien été ajouté."
+        );
+
+        $crawler = $this->client->request(Request::METHOD_GET, $this->urlGenerator->generate('user_create'));
+        $form = $crawler->selectButton('Ajouter')->form();
+        $form['user[username]'] = 'Pedro';
+        $form['user[roles]'] = 'ROLE_USER';
+        $form['user[password][first]'] = '123456';
+        $form['user[password][second]'] = '123456';
+        $form['user[email]'] = 'pedro09@gmail.com';
+        $this->client->submit($form);
+        $this->assertSelectorTextContains(
+            'div.alert.alert-danger',
+            "l'utilisateur éxiste déjà."
         );
 
         $crawler = $this->client->request(Request::METHOD_GET, $this->urlGenerator->generate('user_create'));
@@ -65,11 +78,11 @@ class UserControllerTest extends WebTestCase
         $form['user[password][second]'] = '123456';
         $form['user[email]'] = 'pedro@gmail.com';
         $this->client->submit($form);
-        $this->assertSelectorTextNotContains(
-            'div',
-            "<ul><li>Cette valeur est déjà utilisée.</li></ul>"
+       echo $this->client->getResponse()->getContent();
+        $this->assertSelectorTextContains(
+            'html li',
+            "Cette valeur est déjà utilisée."
         );
-
     }
 
     public function testWrongPasswordInputUser()
@@ -82,9 +95,9 @@ class UserControllerTest extends WebTestCase
         $form['user[password][second]'] = '12456';
         $form['user[email]'] = 'pedro@gmail.com';
         $this->client->submit($form);
-        $this->assertSelectorTextNotContains(
-            'div',
-            "<ul><li>Les deux mots de passe doivent correspondre.</li></ul>"
+        $this->assertSelectorTextContains(
+            'html li',
+            "Les deux mots de passe doivent correspondre."
         );
     }
 
@@ -98,9 +111,9 @@ class UserControllerTest extends WebTestCase
         $form['user[password][second]'] = $random;
         $form['user[email]'] = "$random@hotmail.com";
         $this->client->submit($form);
-        $this->assertSelectorTextNotContains(
+        $this->assertSelectorTextContains(
             'div.alert.alert-success',
-            "<strong>Superbe !</strong>  L'utilisateur a bien été ajouté."
+            "L'utilisateur a bien été modifié"
         );
 
     }

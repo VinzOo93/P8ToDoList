@@ -37,7 +37,7 @@ class UserController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() &&$form->isValid()) {
             if ($userRepo->findOneBy(['username' => $form->get('username')->getData()])) {
-                $this->addFlash('error', "l'utilisateur éxiste déjà");
+                $this->addFlash('error', "l'utilisateur éxiste déjà.");
                 return  $this->redirectToRoute('user_create');
             }
             $role = $form->get('roles');
