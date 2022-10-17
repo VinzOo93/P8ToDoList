@@ -16,7 +16,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks", name="task_list")
      */
-    public function listAction(EntityManagerInterface $entityManager): Response
+    public function list(EntityManagerInterface $entityManager): Response
     {
         return $this->render('task/list.html.twig', ['tasks' => $entityManager->getRepository(Task::class)->findAll()]);
     }
@@ -24,7 +24,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks/create", name="task_create")
      */
-    public function createAction(Request $request, EntityManagerInterface $entityManager)
+    public function create(Request $request, EntityManagerInterface $entityManager)
     {
         $task = new Task();
         $form = $this->createForm(TaskType::class, $task);
@@ -48,7 +48,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks/{id}/edit", name="task_edit")
      */
-    public function editAction(Task $task, EntityManagerInterface $entityManager, Request $request)
+    public function edit(Task $task, EntityManagerInterface $entityManager, Request $request)
     {
 
         $form = $this->createForm(TaskType::class, $task);
@@ -72,7 +72,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks/{id}/toggle", name="task_toggle")
      */
-    public function toggleTaskAction(Task $task, EntityManagerInterface $entityManager): RedirectResponse
+    public function toggleTask(Task $task, EntityManagerInterface $entityManager): RedirectResponse
     {
         $task->toggle(!$task->isDone());
         $entityManager->flush();
@@ -85,13 +85,13 @@ class TaskController extends AbstractController
     /**
      * @Route("/tasks/{id}/delete", name="task_delete")
      */
-    public function deleteTaskAction(Task $task, EntityManagerInterface $entityManager ): RedirectResponse
+    public function deleteTask(Task $task, EntityManagerInterface $entityManager ): RedirectResponse
     {
         if ($this->getUser() === $task->getAuthor()){
-        $this->deleteTask($task, $entityManager);
+        $this->removeTask($task, $entityManager);
         }
         if ($this->getUser()->getRoles() == 'ROLES_ADMIN' && $task->getId() == null){
-            $this->deleteTask($task, $entityManager);
+            $this->removeTask($task, $entityManager);
         }
 
         $this->addFlash('success', 'La tâche a bien été supprimée.');
@@ -99,7 +99,7 @@ class TaskController extends AbstractController
         return $this->redirectToRoute('task_list');
     }
 
-    private function deleteTask(Task $task,  EntityManagerInterface $entityManager)
+    private function removeTask(Task $task,  EntityManagerInterface $entityManager)
     {
         $entityManager->remove($task);
         $entityManager->flush();

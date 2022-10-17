@@ -16,7 +16,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users", name="user_list")
      */
-    public function listAction(EntityManagerInterface $entityManager): Response
+    public function list(EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -26,7 +26,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users/create", name="user_create")
      */
-    public function createAction(Request $request, EntityManagerInterface $entityManager ,UserPasswordHasherInterface $userPasswordHasher)
+    public function create(Request $request, EntityManagerInterface $entityManager ,UserPasswordHasherInterface $userPasswordHasher)
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
@@ -59,7 +59,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users/{id}/edit", name="user_edit")
      */
-    public function editAction(User $user, EntityManagerInterface $entityManager, UserPasswordHasherInterface $userPasswordHasher, Request $request)
+    public function edit(User $user, EntityManagerInterface $entityManager, UserPasswordHasherInterface $userPasswordHasher, Request $request)
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
