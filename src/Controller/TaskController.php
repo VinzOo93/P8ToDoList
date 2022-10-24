@@ -22,7 +22,7 @@ class TaskController extends AbstractController
     }
 
     /**
-     * @Route("/tasks/create", name="task_create")
+     * @Route("/profile/tasks/create", name="task_create")
      */
     public function create(Request $request, EntityManagerInterface $entityManager)
     {
@@ -46,7 +46,7 @@ class TaskController extends AbstractController
     }
 
     /**
-     * @Route("/tasks/{id}/edit", name="task_edit")
+     * @Route("profile/tasks/{id}/edit", name="task_edit")
      */
     public function edit(Task $task, EntityManagerInterface $entityManager, Request $request)
     {

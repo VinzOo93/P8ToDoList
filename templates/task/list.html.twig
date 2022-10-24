@@ -4,7 +4,10 @@
                            alt="todo list">{% endblock %}
 
 {% block body %}
-    <a href="{{ path('task_create') }}" class="btn btn-info pull-right">Créer une tâche</a>
+    {% if is_granted('ROLE_USER') or is_granted('ROLE_USER') %}
+        <a href="{{ path('task_create') }}"
+           class="btn btn-warning pull-right">Créer une tâche</a>
+    {% endif %}
     <div class="row">
         {% for task in tasks %}
             <div class="col-sm-4 col-lg-4 col-md-4">
@@ -47,8 +50,11 @@
             </div>
         {% else %}
             <div class="alert alert-warning" role="alert">
-                Il n'y a pas encore de tâche enregistrée. <a href="{{ path('task_create') }}"
-                                                             class="btn btn-warning pull-right">Créer une tâche</a>
+                Il n'y a pas encore de tâche enregistrée.
+                {% if is_granted('ROLE_USER') or is_granted('ROLE_USER') %}
+                <a href="{{ path('task_create') }}"
+                   class="btn btn-warning pull-right">Créer une tâche</a>
+                {% endif %}
             </div>
         {% endfor %}
     </div>
